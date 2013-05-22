@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Particles!</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <script>
+            var m_iMap = { width: 0, height: 0 , backgroundColor: "black" };
+            var m_iVelWidthMod = 50;
+            var m_iParticle = { particles: new Array(), minLife: 5, maxLife: 20};
+            var m_iSpeedGame = 50;
+            var m_iIntervalGame = null;
+            var m_CanvasMain = null;
+            
+            window.addEventListener("mousemove", mouseDownEvent, true);
+            document.addEventListener("DOMContentLoaded", initializeGame, false);
+            document.documentElement.style.overflowX = "hidden";	 // Horizontal scrollbar will be hidden
+            document.documentElement.style.overflowY = "hidden";     // Vertical scrollbar will be hidden
+            
+            // Initializes all needed stuff
+            function initializeGame()
+            {
+                initializeCanvas();
+                m_iIntervalGame = setInterval("gameLoop();", m_iSpeedGame);
+            }
+            
+            // Sets the canvas as big as the broswer size
+            function initializeCanvas() 
+            {
+                m_CanvasMain = document.getElementById("gameCanvas").getContext("2d");
+                m_iMap.width = window.innerWidth - Math.floor(window.innerWidth / 75);
+                m_iMap.height = window.innerHeight - Math.floor(window.innerHeight / 36);
+                m_CanvasMain.canvas.width = m_iMap.width;
+                m_CanvasMain.canvas.height = m_iMap.height;
+            }
+            
+            // Loop to run all the conditions
+            function gameLoop()
+            {
+                m_CanvasMain.fillStyle = m_iMap.backgroundColor;
+                m_CanvasMain.fillRect(0, 0, m_iMap.width, m_iMap.height);
+                    
+                for(var index = 0; index < m_iParticle.particles.length; index++)
+                {
+                    m_CanvasMain.fillStyle = getRandomColor(0, 255);
+                    m_CanvasMain.fillRect(m_iParticle.particles[index].x, m_iParticle.particles[index].y, 2, 2);
+                    m_iParticle.particles[index].x += m_iParticle.particles[index].xV;
+                    m_iParticle.particles[index].y += m_iParticle.particles[index].yV;
+                    m_iParticle.particles[index].life--;
+                    
+                    if(m_iParticle.particles[index].life <= 0)
+                    {
+                        m_iParticle.particles.splice(index, 1);
+                        
+                        if(index > 0)
+                            index--;
+                    }
+                }
+            }
+            
+            // Makes a new particle
+            function makeNewParticle(centerX, centerY)
+            {
+                var particleVel = getRandomVel();
+                var newParticle = { x: centerX, y: centerY, life: getRandomNumber(m_iParticle.minLife, m_iParticle.maxLife), xV: particleVel.xV, yV: particleVel.yV };
+                
+                m_iParticle.particles.push(newParticle);
+            }
+            
+            // Returns random velocity
+            function getRandomVel()
+            {
+                var velocity = { xV: 0, yV: 0 };
+                var maxVelocity = Math.floor(m_iMap.height / m_iVelWidthMod);
+                
+                velocity.xV = getRandomNumber(-maxVelocity, maxVelocity);
+                velocity.yV = getRandomNumber(-maxVelocity, maxVelocity);
+                return velocity;
+            }
+            
+            // Handles the mouse down event
+            function mouseDownEvent(e)
+            {
+                var limit = getRandomNumber(25, 50);
+                
+                for(var index = 0; index < limit; index++)
+                    makeNewParticle(e.x, e.y);
+            }
+            
+            // Returns random color between iMin and iMax.
+            function getRandomColor(iMin, iMax)
+            {
+                // Creating a random number between iMin and iMax, converting to hex
+                var hexR = (getRandomNumber(iMin, iMax)).toString(16);
+                var hexG = (getRandomNumber(iMin, iMax)).toString(16);
+                var hexB = (getRandomNumber(iMin, iMax)).toString(16);
+
+                // Making sure single character values are prepended with a "0"
+                if (hexR.length == 1)
+                    hexR = "0" + hexR;
+
+                if (hexG.length == 1)
+                    hexG = "0" + hexG;
+
+                if (hexB.length == 1)
+                    hexB = "0" + hexB;
+
+                // Creating the hex value by concatenatening the string values
+                return ("#" + hexR + hexG + hexB).toUpperCase();
+            }
+
+            // Returns random number between iMin and iMax, include iMin and iMax
+            function getRandomNumber(iMin, iMax)
+            {
+                if(iMax < iMin)
+                {
+                    var temp = iMax;
+                    iMax = iMin;
+                    iMin = temp;
+                }
+
+                return Math.floor((Math.random() * ((iMax + 1) - iMin)) + iMin);
+            }       
+        </script>
+    </head>
+    <body>
+        <canvas id="gameCanvas"></canvas>
+    </body>
+</html>

@@ -70,11 +70,11 @@
             // Returns random velocity
             function getRandomVel()
             {
-                var velocity = { xV: 0, yV: 0 };
                 var maxVelocity = Math.floor(m_iMap.height / m_iVelWidthMod);
-                
-                velocity.xV = getRandomNumber(-maxVelocity, maxVelocity);
-                velocity.yV = getRandomNumber(-maxVelocity, maxVelocity);
+                var velocity = { xV: getRandomNumber(-maxVelocity, maxVelocity), yV: 0 };
+                var newYLimit = Math.floor(Math.sqrt(Math.pow(maxVelocity, 2) - Math.pow(velocity.xV, 2)));
+				
+                velocity.yV = getRandomNumber(-newYLimit, newYLimit);
                 return velocity;
             }
             

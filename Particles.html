@@ -6,8 +6,7 @@
         
         <script>
             var m_iMap = { width: 0, height: 0 , backgroundColor: "black" };
-            var m_iVelWidthMod = 50;
-            var m_iParticle = { particles: new Array(), minLife: 5, maxLife: 20};
+            var m_iParticle = { particles: new Array(), minLife: 250, maxLife: 750, velWidthMod: 50 };
             var m_iSpeedGame = 50;
             var m_iIntervalGame = null;
             var m_CanvasMain = null;
@@ -21,18 +20,12 @@
             // Initializes all needed stuff
             function initializeGame()
             {
-                initializeCanvas();
-                m_iIntervalGame = setInterval("gameLoop();", m_iSpeedGame);
-            }
-            
-            // Sets the canvas as big as the broswer size
-            function initializeCanvas() 
-            {
                 m_CanvasMain = document.getElementById("gameCanvas").getContext("2d");
                 m_iMap.width = window.innerWidth - Math.floor(window.innerWidth / 75);
                 m_iMap.height = window.innerHeight - Math.floor(window.innerHeight / 36);
                 m_CanvasMain.canvas.width = m_iMap.width;
                 m_CanvasMain.canvas.height = m_iMap.height;
+                m_iIntervalGame = setInterval("gameLoop();", m_iSpeedGame);
             }
             
             // Loop to run all the conditions
@@ -62,21 +55,19 @@
             // Makes a new particle
             function makeNewParticle(centerX, centerY)
             {
-                var particleVel = getRandomVel();
-                var newParticle = { x: centerX, y: centerY, life: getRandomNumber(m_iParticle.minLife, m_iParticle.maxLife), xV: particleVel.xV, yV: particleVel.yV };
-                
-                m_iParticle.particles.push(newParticle);
-            }
-            
-            // Returns random velocity
-            function getRandomVel()
-            {
-                var maxVelocity = Math.floor(m_iMap.height / m_iVelWidthMod);
+                var newParticle = { x: 0, y: 0, life: 0, xV: 0, yV: 0 };
+                var maxVelocity = Math.floor(m_iMap.height / m_iParticle.velWidthMod);
                 var velocity = { xV: getRandomNumber(-maxVelocity, maxVelocity), yV: 0 };
                 var newYLimit = Math.floor(Math.sqrt(Math.pow(maxVelocity, 2) - Math.pow(velocity.xV, 2))) + 1;
 				
                 velocity.yV = getRandomNumber(-newYLimit, newYLimit);
-                return velocity;
+                newParticle.x = centerX;
+                newParticle.y = centerY;
+                newParticle.life = getRandomNumber(Math.floor(m_iParticle.minLife / m_iSpeedGame), Math.floor(m_iParticle.maxLife / m_iSpeedGame));
+                newParticle.xV = velocity.xV;
+                newParticle.yV = velocity.yV;
+                
+                m_iParticle.particles.push(newParticle);
             }
             
             // Handles the mouse move event

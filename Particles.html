@@ -56,16 +56,16 @@
             function makeNewParticle(centerX, centerY)
             {
                 var newParticle = { x: 0, y: 0, life: 0, xV: 0, yV: 0 };
-                var maxVelocity = Math.floor(m_iMap.height / m_iParticle.velWidthMod);
-                var velocity = { xV: getRandomNumber(-maxVelocity, maxVelocity), yV: 0 };
-                var newYLimit = Math.floor(Math.sqrt(Math.pow(maxVelocity, 2) - Math.pow(velocity.xV, 2))) + 1;
+                var maxVelocity = m_iMap.height / m_iParticle.velWidthMod;
+                var velocity = { xV: getRandomNumber(-maxVelocity, maxVelocity, false), yV: 0 };
+                var newYLimit = Math.sqrt(Math.pow(maxVelocity, 2) - Math.pow(velocity.xV, 2)) + 1;
 				
-                velocity.yV = getRandomNumber(-newYLimit, newYLimit);
+                velocity.yV = getRandomNumber(-newYLimit, newYLimit, false);
                 newParticle.x = centerX;
                 newParticle.y = centerY;
-                newParticle.life = getRandomNumber(Math.floor(m_iParticle.minLife / m_iSpeedGame), Math.floor(m_iParticle.maxLife / m_iSpeedGame));
-                newParticle.xV = velocity.xV;
-                newParticle.yV = velocity.yV;
+                newParticle.life = getRandomNumber(Math.floor(m_iParticle.minLife / m_iSpeedGame), Math.floor(m_iParticle.maxLife / m_iSpeedGame), true);
+                newParticle.xV = Math.floor(velocity.xV);
+                newParticle.yV = Math.floor(velocity.yV);
                 
                 m_iParticle.particles.push(newParticle);
             }
@@ -73,7 +73,7 @@
             // Handles the mouse move event
             function mouseMoveEvent(e)
             {
-                var limit = getRandomNumber(25, 50);
+                var limit = getRandomNumber(25, 50, true);
                 
                 for(var index = 0; index < limit; index++)
                     makeNewParticle(e.x, e.y);
@@ -82,7 +82,7 @@
             // Handles the mouse click event
             function mouseClickEvent(e)
             {
-                var limit = getRandomNumber(100, 250);
+                var limit = getRandomNumber(100, 250, true);
                 
                 for(var index = 0; index < limit; index++)
                     makeNewParticle(e.x, e.y);
@@ -92,9 +92,9 @@
             function getRandomColor(iMin, iMax)
             {
                 // Creating a random number between iMin and iMax, converting to hex
-                var hexR = (getRandomNumber(iMin, iMax)).toString(16);
-                var hexG = (getRandomNumber(iMin, iMax)).toString(16);
-                var hexB = (getRandomNumber(iMin, iMax)).toString(16);
+                var hexR = (getRandomNumber(iMin, iMax, true)).toString(16);
+                var hexG = (getRandomNumber(iMin, iMax, true)).toString(16);
+                var hexB = (getRandomNumber(iMin, iMax, true)).toString(16);
 
                 // Making sure single character values are prepended with a "0"
                 if (hexR.length == 1)
@@ -111,7 +111,7 @@
             }
 
             // Returns random number between iMin and iMax, include iMin and iMax
-            function getRandomNumber(iMin, iMax)
+            function getRandomNumber(iMin, iMax, bFloorIt)
             {
                 if(iMax < iMin)
                 {
@@ -119,7 +119,10 @@
                     iMax = iMin;
                     iMin = temp;
                 }
-
+                
+                if(!bFloorIt)
+                    return (Math.random() * ((iMax + 1) - iMin)) + iMin;
+                
                 return Math.floor((Math.random() * ((iMax + 1) - iMin)) + iMin);
             }       
         </script>

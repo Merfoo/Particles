@@ -6,13 +6,13 @@
         
         <script>
             var m_iMap = { width: 0, height: 0 , backgroundColor: "black" };
-            var m_iParticle = { particles: new Array(), minLife: 250, maxLife: 750, velWidthMod: 50 };
+            var m_iParticle = { particles: new Array(), minLife: 250, maxLife: 750, velWidthMod: 50, minSizeMod: 60, maxSizeMod: 20 };
             var m_iSpeedGame = 50;
             var m_iIntervalGame = null;
             var m_CanvasMain = null;
             
-            window.addEventListener("mousemove", mouseMoveEvent, true);
-            window.addEventListener("mousedown", mouseClickEvent, true);
+            window.addEventListener("mousemove", mouseEvent, true);
+            window.addEventListener("mousedown", mouseEvent, true);
             document.addEventListener("DOMContentLoaded", initializeGame, false);
             document.documentElement.style.overflowX = "hidden";	 // Horizontal scrollbar will be hidden
             document.documentElement.style.overflowY = "hidden";     // Vertical scrollbar will be hidden
@@ -37,7 +37,7 @@
                 for(var index = 0; index < m_iParticle.particles.length; index++)
                 {
                     m_CanvasMain.fillStyle = getRandomColor(0, 255);
-                    m_CanvasMain.fillRect(m_iParticle.particles[index].x, m_iParticle.particles[index].y, 2, 2);
+                    m_CanvasMain.fillRect(m_iParticle.particles[index].x - Math.floor(m_iParticle.particles[index].size / 2), m_iParticle.particles[index].y - Math.floor(m_iParticle.particles[index].size / 2), m_iParticle.particles[index].size, m_iParticle.particles[index].size);
                     m_iParticle.particles[index].x += m_iParticle.particles[index].xV;
                     m_iParticle.particles[index].y += m_iParticle.particles[index].yV;
                     m_iParticle.particles[index].life--;
@@ -55,10 +55,10 @@
             // Makes a new particle
             function makeNewParticle(centerX, centerY)
             {
-                var newParticle = { x: 0, y: 0, life: 0, xV: 0, yV: 0 };
-                var maxVelocity = m_iMap.height / m_iParticle.velWidthMod;
+                var newParticle = { x: 0, y: 0, life: 0, xV: 0, yV: 0, size: 0 };
+                var maxVelocity = m_iMap.height / 50;
                 var velocity = { xV: getRandomNumber(-maxVelocity, maxVelocity, false), yV: 0 };
-                var newYLimit = Math.sqrt(Math.pow(maxVelocity, 2) - Math.pow(velocity.xV, 2)) + 1;
+                var newYLimit = Math.sqrt(Math.pow(maxVelocity, 2) - Math.pow(velocity.xV, 2));
 				
                 velocity.yV = getRandomNumber(-newYLimit, newYLimit, false);
                 newParticle.x = centerX;
@@ -66,26 +66,18 @@
                 newParticle.life = getRandomNumber(Math.floor(m_iParticle.minLife / m_iSpeedGame), Math.floor(m_iParticle.maxLife / m_iSpeedGame), true);
                 newParticle.xV = Math.floor(velocity.xV);
                 newParticle.yV = Math.floor(velocity.yV);
-                
+                newParticle.size = getRandomNumber(m_iMap.height / m_iParticle.minSizeMod, m_iMap.height / m_iParticle.maxSizeMod, true);
                 m_iParticle.particles.push(newParticle);
             }
             
-            // Handles the mouse move event
-            function mouseMoveEvent(e)
+            // Handles the mouse event
+            function mouseEvent(e)
             {
+                var mouse = { x: e.x - m_CanvasMain.canvas.offsetLeft, y: e.y - m_CanvasMain.canvas.offsetTop };
                 var limit = getRandomNumber(25, 50, true);
                 
                 for(var index = 0; index < limit; index++)
-                    makeNewParticle(e.x, e.y);
-            }
-            
-            // Handles the mouse click event
-            function mouseClickEvent(e)
-            {
-                var limit = getRandomNumber(100, 250, true);
-                
-                for(var index = 0; index < limit; index++)
-                    makeNewParticle(e.x, e.y);
+                    makeNewParticle(mouse.x, mouse.y);
             }
             
             // Returns random color between iMin and iMax.

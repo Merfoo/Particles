@@ -12,7 +12,8 @@
             var m_iIntervalGame = null;
             var m_CanvasMain = null;
             
-            window.addEventListener("mousemove", mouseDownEvent, true);
+            window.addEventListener("mousemove", mouseMoveEvent, true);
+            window.addEventListener("mousedown", mouseClickEvent, true);
             document.addEventListener("DOMContentLoaded", initializeGame, false);
             document.documentElement.style.overflowX = "hidden";	 // Horizontal scrollbar will be hidden
             document.documentElement.style.overflowY = "hidden";     // Vertical scrollbar will be hidden
@@ -72,16 +73,25 @@
             {
                 var maxVelocity = Math.floor(m_iMap.height / m_iVelWidthMod);
                 var velocity = { xV: getRandomNumber(-maxVelocity, maxVelocity), yV: 0 };
-                var newYLimit = Math.floor(Math.sqrt(Math.pow(maxVelocity, 2) - Math.pow(velocity.xV, 2)));
+                var newYLimit = Math.floor(Math.sqrt(Math.pow(maxVelocity, 2) - Math.pow(velocity.xV, 2))) + 1;
 				
                 velocity.yV = getRandomNumber(-newYLimit, newYLimit);
                 return velocity;
             }
             
-            // Handles the mouse down event
-            function mouseDownEvent(e)
+            // Handles the mouse move event
+            function mouseMoveEvent(e)
             {
                 var limit = getRandomNumber(25, 50);
+                
+                for(var index = 0; index < limit; index++)
+                    makeNewParticle(e.x, e.y);
+            }
+            
+            // Handles the mouse click event
+            function mouseClickEvent(e)
+            {
+                var limit = getRandomNumber(100, 250);
                 
                 for(var index = 0; index < limit; index++)
                     makeNewParticle(e.x, e.y);

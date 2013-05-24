@@ -37,7 +37,12 @@
                 for(var index = 0; index < m_iParticle.particles.length; index++)
                 {
                     m_CanvasMain.fillStyle = getRandomColor(0, 255);
-                    m_CanvasMain.fillRect(m_iParticle.particles[index].x - Math.floor(m_iParticle.particles[index].size / 2), m_iParticle.particles[index].y - Math.floor(m_iParticle.particles[index].size / 2), m_iParticle.particles[index].size, m_iParticle.particles[index].size);
+                    m_CanvasMain.fillRect
+                    (
+                        m_iParticle.particles[index].x - Math.floor(m_iParticle.particles[index].size / 2), 
+                        m_iParticle.particles[index].y - Math.floor(m_iParticle.particles[index].size / 2), 
+                        m_iParticle.particles[index].size, m_iParticle.particles[index].size
+                    );
                     m_iParticle.particles[index].x += m_iParticle.particles[index].xV;
                     m_iParticle.particles[index].y += m_iParticle.particles[index].yV;
                     m_iParticle.particles[index].life--;
@@ -74,7 +79,7 @@
             function mouseEvent(e)
             {
                 var mouse = { x: e.x - m_CanvasMain.canvas.offsetLeft, y: e.y - m_CanvasMain.canvas.offsetTop };
-                var limit = getRandomNumber(25, 50, true);
+                var limit = getRandomNumber(5, 10, true);
                 
                 for(var index = 0; index < limit; index++)
                     makeNewParticle(mouse.x, mouse.y);

@@ -68,7 +68,7 @@
                 velocity.yV = getRandomNumber(-newYLimit, newYLimit, false);
                 newParticle.x = centerX;
                 newParticle.y = centerY;
-                newParticle.life = getRandomNumber(Math.floor(m_iParticle.minLife / m_iSpeedGame), Math.floor(m_iParticle.maxLife / m_iSpeedGame), true);
+                newParticle.life = getRandomNumber(m_iParticle.minLife / m_iSpeedGame, m_iParticle.maxLife / m_iSpeedGame, true);
                 newParticle.xV = Math.floor(velocity.xV);
                 newParticle.yV = Math.floor(velocity.yV);
                 newParticle.size = getRandomNumber(m_iMap.height / m_iParticle.minSizeMod, m_iMap.height / m_iParticle.maxSizeMod, true);

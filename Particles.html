@@ -6,16 +6,18 @@
         
         <script>
             var m_iMap = { width: 0, height: 0 , backgroundColor: "black" };
-            var m_iParticle = { particles: new Array(), minLife: 250, maxLife: 750, velWidthMod: 50, minSizeMod: 60, maxSizeMod: 20 };
-            var m_iSpeedGame = 50;
+            var m_iMouse = { x: 0, y: 0 };
+            var m_iLastMouse = { x: 0, y: 0 };
+            var m_iParticle = { particles: new Array(), minLife: 250, maxLife: 750, velWidthMod: 75, minSizeMod: 200, maxSizeMod: 90 };
+            var m_iSpeedGame = 33;
             var m_iIntervalGame = null;
             var m_CanvasMain = null;
             
             window.addEventListener("mousemove", mouseEvent, true);
             window.addEventListener("mousedown", mouseEvent, true);
             document.addEventListener("DOMContentLoaded", initializeGame, false);
-            document.documentElement.style.overflowX = "hidden";	 // Horizontal scrollbar will be hidden
-            document.documentElement.style.overflowY = "hidden";     // Vertical scrollbar will be hidden
+            document.documentElement.style.overflowX = "hidden";                    // Horizontal scrollbar will be hidden
+            document.documentElement.style.overflowY = "hidden";                    // Vertical scrollbar will be hidden
             
             // Initializes all needed stuff
             function initializeGame()
@@ -36,16 +38,14 @@
                     
                 for(var index = 0; index < m_iParticle.particles.length; index++)
                 {
-                    m_CanvasMain.fillStyle = getRandomColor(0, 255);
-                    m_CanvasMain.fillRect
-                    (
-                        m_iParticle.particles[index].x - Math.floor(m_iParticle.particles[index].size / 2), 
-                        m_iParticle.particles[index].y - Math.floor(m_iParticle.particles[index].size / 2), 
-                        m_iParticle.particles[index].size, m_iParticle.particles[index].size
-                    );
                     m_iParticle.particles[index].x += m_iParticle.particles[index].xV;
                     m_iParticle.particles[index].y += m_iParticle.particles[index].yV;
                     m_iParticle.particles[index].life--;
+                    m_iParticle.particles[index].size *= 0.99;
+                    m_CanvasMain.beginPath();
+                    m_CanvasMain.fillStyle = m_iParticle.particles[index].color;
+                    m_CanvasMain.arc(m_iParticle.particles[index].x, m_iParticle.particles[index].y, m_iParticle.particles[index].size, 0, 2 * Math.PI);
+                    m_CanvasMain.fill();
                     
                     if(m_iParticle.particles[index].life <= 0)
                     {
@@ -55,22 +55,23 @@
                             index--;
                     }
                 }
+
+		document.getElementById("infoBox").innerHTML = "   " + "Dots on screen: " + m_iParticle.particles.length;
             }
             
             // Makes a new particle
             function makeNewParticle(centerX, centerY)
             {
-                var newParticle = { x: 0, y: 0, life: 0, xV: 0, yV: 0, size: 0 };
-                var maxVelocity = m_iMap.height / 50;
-                var velocity = { xV: getRandomNumber(-maxVelocity, maxVelocity, false), yV: 0 };
-                var newYLimit = Math.sqrt(Math.pow(maxVelocity, 2) - Math.pow(velocity.xV, 2));
-				
-                velocity.yV = getRandomNumber(-newYLimit, newYLimit, false);
+                var newParticle = { x: 0, y: 0, life: 0, xV: 0, yV: 0, size: 0, color: getRandomColor(0, 255) };
+                var maxVelocity = m_iMap.height / m_iParticle.velWidthMod;
+                var ang = Math.random() * 2 * Math.PI;
+                var r = Math.random() * maxVelocity;
+                
+                newParticle.xV = Math.sin(ang) * r;
+                newParticle.yV = Math.cos(ang) * r;
                 newParticle.x = centerX;
                 newParticle.y = centerY;
                 newParticle.life = getRandomNumber(m_iParticle.minLife / m_iSpeedGame, m_iParticle.maxLife / m_iSpeedGame, true);
-                newParticle.xV = Math.floor(velocity.xV);
-                newParticle.yV = Math.floor(velocity.yV);
                 newParticle.size = getRandomNumber(m_iMap.height / m_iParticle.minSizeMod, m_iMap.height / m_iParticle.maxSizeMod, true);
                 m_iParticle.particles.push(newParticle);
             }
@@ -78,11 +79,16 @@
             // Handles the mouse event
             function mouseEvent(e)
             {
-                var mouse = { x: e.x - m_CanvasMain.canvas.offsetLeft, y: e.y - m_CanvasMain.canvas.offsetTop };
-                var limit = getRandomNumber(5, 10, true);
+                m_iMouse.x = e.x - m_CanvasMain.canvas.offsetLeft;
+                m_iMouse.y = e.y - m_CanvasMain.canvas.offsetTop;
+                var distance = getDistance(m_iMouse, m_iLastMouse);
+                var limit = distance;//Math.abs(getRandomNumber(distance / 5, distance / 3 * 2, true));
                 
                 for(var index = 0; index < limit; index++)
-                    makeNewParticle(mouse.x, mouse.y);
+                    makeNewParticle(m_iMouse.x, m_iMouse.y);
+                
+                m_iLastMouse.x = m_iMouse.x;
+                m_iLastMouse.y = m_iMouse.y;
             }
             
             // Returns random color between iMin and iMax.
@@ -121,10 +127,17 @@
                     return (Math.random() * ((iMax + 1) - iMin)) + iMin;
                 
                 return Math.floor((Math.random() * ((iMax + 1) - iMin)) + iMin);
-            }       
+            }  
+            
+            // Returns the distance between two points
+            function getDistance(pointA, pointB)
+            {
+                return Math.sqrt(Math.pow(pointB.x - pointA.x, 2) + Math.pow(pointB.y - pointA.y, 2));
+            }
         </script>
     </head>
     <body>
+	<div id="infoBox" style="position: absolute; margin-top: 0px; margin-left: 0px; width: 170px; background: gray; opacity: .9; font-size: 14pt"></div>
         <canvas id="gameCanvas"></canvas>
     </body>
 </html>
